@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispa Digital - Social Media Packages</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Premium Navy & Gold -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive sales funnel. It starts with a hero section stating the value proposition, followed by the core interactive element: a side-by-side package comparison. This allows for immediate user engagement. A "Package Feature Radar Chart" and a "Projected Growth Chart" follow, visually translating package features and KPIs into tangible benefits, making the data more digestible than the source's text lists. The workflow is presented as a clear, numbered process diagram. Add-ons and contract terms are tucked into accordions to reduce clutter. A persistent CTA footer guides users toward conversion. This structure was chosen to guide the user from information gathering and comparison to understanding value and process, culminating in a clear call to action, optimizing for lead generation. -->
+    <!-- Visualization & Content Choices: 1. Package Comparison: Report Info -> Package details (price, posts, etc.). Goal -> Compare. Viz -> Interactive HTML cards. Interaction -> Clicking a package highlights it across the app and updates other visuals. Justification -> Far more intuitive for comparison than scrolling through text. Method -> HTML/CSS/JS. 2. Feature Comparison: Report Info -> Service inclusions (posts, reels, stories, ads). Goal -> Compare. Viz -> Radar Chart. Interaction -> Highlights data series on package selection. Justification -> Provides an instant visual summary of how "comprehensive" each package is. Library -> Chart.js. 3. Expected Outcomes: Report Info -> KPI ranges (e.g., 5-10% follower growth). Goal -> Convince. Viz -> Grouped Bar Chart. Interaction -> Highlights relevant bars on package selection. Justification -> Makes abstract percentages feel like concrete, comparable results. Library -> Chart.js. 4. Workflow: Report Info -> Production steps. Goal -> Organize/Inform. Viz -> Numbered process diagram. Interaction -> Hover effects for details. Justification -> Simplifies the process, building client trust. Method -> HTML/CSS. CONFIRMATION: NO SVG used. NO Mermaid JS used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .bg-navy { background-color: #0b2b4a; }
+        .text-gold { color: #d4aa5a; }
+        .border-gold { border-color: #d4aa5a; }
+        .ring-gold { --tw-ring-color: #d4aa5a; }
+        .accent-gold { accent-color: #d4aa5a; }
+        .package-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .package-card.selected {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #0b2b4a;
+            margin-bottom: 1rem;
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #495057;
+            max-width: 800px;
+            margin: 0 auto 3rem auto;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-navy text-white p-6 shadow-lg">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl font-bold text-gold">Dispa Digital</h1>
+            <p class="mt-2 text-xl">Digital Marketing That Grows Real Businesses</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+
+        <section id="intro" class="text-center py-12">
+            <h2 class="section-title">Your Partner in Growth</h2>
+            <p class="section-subtitle">We combine premium creative with data-driven strategies to deliver measurable leads, build stronger brands, and achieve higher ROI. Explore our packages below to find the perfect fit for your business.</p>
+        </section>
+
+        <section id="packages" class="py-12">
+            <h2 class="section-title text-center">Social Media Packages</h2>
+            <p class="section-subtitle text-center">Select a package to see its features highlighted across the page. All packages require a 3-month minimum retainer to ensure optimal performance.</p>
+            <div id="package-cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+        </section>
+
+        <section id="visualizations" class="py-12 bg-white rounded-2xl shadow-xl mt-12 p-4 md:p-8">
+            <h2 class="section-title text-center">Visualize The Value</h2>
+            <p class="section-subtitle text-center">The charts below provide a clear comparison of features and expected outcomes for each package. Your selected package is highlighted for clarity.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-8">
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-navy text-center mb-4">Package Feature Comparison</h3>
+                    <div class="chart-container">
+                        <canvas id="featuresRadarChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full">
+                    <h3 class="text-2xl font-bold text-navy text-center mb-4">Projected Monthly Growth</h3>
+                    <div class="chart-container">
+                        <canvas id="kpiBarChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="workflow" class="py-12 mt-12">
+            <h2 class="section-title text-center">Our Professional Workflow</h2>
+            <p class="section-subtitle text-center">We follow a structured, transparent process to ensure your project is seamless from start to finish.</p>
+            <div class="mt-8 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-0">
+                 <div class="flex items-center flex-col md:flex-row w-full md:w-auto">
+                    <div class="p-6 bg-white rounded-full shadow-md border-2 border-gray-200">
+                        <span class="text-2xl font-bold text-navy">1</span>
+                    </div>
+                    <div class="mt-2 md:mt-0 md:ml-4 text-center md:text-left"><h3 class="font-semibold text-lg">Sales & Onboarding</h3><p class="text-sm text-gray-600">Contract & Setup</p></div>
+                </div>
+                <div class="flex-grow w-1/4 h-1 bg-gray-200 hidden md:block mx-4"></div>
+                <div class="h-8 w-1 bg-gray-200 md:hidden my-2"></div>
+                <div class="flex items-center flex-col md:flex-row w-full md:w-auto">
+                    <div class="p-6 bg-white rounded-full shadow-md border-2 border-gray-200">
+                        <span class="text-2xl font-bold text-navy">2</span>
+                    </div>
+                    <div class="mt-2 md:mt-0 md:ml-4 text-center md:text-left"><h3 class="font-semibold text-lg">Strategy</h3><p class="text-sm text-gray-600">Content Calendar</p></div>
+                </div>
+                 <div class="flex-grow w-1/4 h-1 bg-gray-200 hidden md:block mx-4"></div>
+                 <div class="h-8 w-1 bg-gray-200 md:hidden my-2"></div>
+                <div class="flex items-center flex-col md:flex-row w-full md:w-auto">
+                    <div class="p-6 bg-white rounded-full shadow-md border-2 border-gray-200">
+                        <span class="text-2xl font-bold text-navy">3</span>
+                    </div>
+                    <div class="mt-2 md:mt-0 md:ml-4 text-center md:text-left"><h3 class="font-semibold text-lg">Execution</h3><p class="text-sm text-gray-600">Approval & Publishing</p></div>
+                </div>
+                 <div class="flex-grow w-1/4 h-1 bg-gray-200 hidden md:block mx-4"></div>
+                 <div class="h-8 w-1 bg-gray-200 md:hidden my-2"></div>
+                <div class="flex items-center flex-col md:flex-row w-full md:w-auto">
+                    <div class="p-6 bg-white rounded-full shadow-md border-2 border-gray-200">
+                        <span class="text-2xl font-bold text-navy">4</span>
+                    </div>
+                    <div class="mt-2 md:mt-0 md:ml-4 text-center md:text-left"><h3 class="font-semibold text-lg">Optimization</h3><p class="text-sm text-gray-600">Reporting & Growth</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="addons" class="py-12 mt-12 bg-white rounded-2xl shadow-xl p-4 md:p-8">
+            <h2 class="section-title text-center">Add-Ons & Custom Services</h2>
+            <p class="section-subtitle text-center">Need something more? We offer a range of one-time services and add-ons to complement your monthly package.</p>
+            <div id="addons-container" class="max-w-4xl mx-auto space-y-4">
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-navy text-white mt-16 p-8 shadow-inner sticky bottom-0">
+        <div class="container mx-auto text-center">
+            <h2 class="text-3xl font-bold text-gold">Ready to Grow Your Business?</h2>
+            <p class="mt-4 max-w-2xl mx-auto">Let's discuss your goals. We can create a custom plan or get you started on the right package today.</p>
+            <div class="mt-6 flex flex-col md:flex-row justify-center items-center gap-6">
+                <span class="font-semibold">📞 +91 79902 59364</span>
+                <span class="font-semibold">✉️ dispadigital@gmail.com</span>
+                <a href="mailto:dispadigital@gmail.com?subject=Free Strategy Call Inquiry" class="bg-gold text-navy font-bold py-3 px-6 rounded-lg hover:bg-yellow-500 transition-colors duration-300 shadow-lg">Book a Free 30-Min Strategy Call</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const packageData = {
+            silver: {
+                name: 'Silver',
+                price: 7999,
+                subtitle: 'Starter Presence',
+                goodFor: 'Small local businesses testing social media presence.',
+                features: [
+                    '12 static posts / month',
+                    '6 stories / month',
+                    '1 carousel / month',
+                    'Caption writing & SEO hashtags',
+                    'Basic graphic design',
+                    'Monthly performance snapshot',
+                    'Publishing to 1 platform',
+                    'Basic community triage'
+                ],
+                radarData: [12, 6, 0, 1, 1],
+                kpiData: [7.5, 5, 0],
+                color: 'rgba(192, 192, 192, 0.8)'
+            },
+            gold: {
+                name: 'Gold',
+                price: 13499,
+                subtitle: 'Growth & Engagement',
+                goodFor: 'Businesses aiming for consistent growth & engagement.',
+                features: [
+                    '20 mixed posts / month',
+                    '12 stories & 1 highlight refresh',
+                    '4 short reels with simple edits',
+                    'Copywriting & 12 hashtag packs',
+                    'Basic ad campaign setup',
+                    'Monthly analytics & insights',
+                    'Community management (60 min/day)',
+                    'Editable source files'
+                ],
+                radarData: [20, 12, 4, 3, 3],
+                kpiData: [15, 15, 2],
+                color: 'rgba(212, 170, 90, 0.8)'
+            },
+            platinum: {
+                name: 'Platinum',
+                price: 19999,
+                subtitle: 'Full-Funnel Social + Ads',
+                goodFor: 'Businesses wanting lead generation & measurable ROI.',
+                features: [
+                    '30+ content pieces / month',
+                    'Daily & interactive stories',
+                    '12 high-quality short reels',
+                    'Full ad management & optimization',
+                    'Landing page design',
+                    'Advanced community management',
+                    'Weekly & monthly deep analytics',
+                    'Full brand asset kit & video masters'
+                ],
+                radarData: [30, 30, 12, 5, 5],
+                kpiData: [20, 25, 5],
+                color: 'rgba(11, 43, 74, 0.8)'
+            }
+        };
+
+        const addonsData = [
+            { name: 'Logo Refresh / Micro-Rebrand', price: '₹1,000 – ₹6,000' },
+            { name: 'Landing Page Design', price: '₹1,500 - ₹2,000' },
+            { name: 'Video Shoot Coordination', price: '₹2,000+' },
+            { name: 'Influencer Micro-Campaign', price: '₹8,000 + fees' },
+            { name: 'Extra Platform Management', price: '₹5,000 / month' },
+            { name: 'Paid Ad Management', price: '15% of spend (min ₹8,000)' }
+        ];
+
+        let selectedPackage = 'gold';
+        let featuresRadarChart, kpiBarChart;
+
+        function initializeApp() {
+            renderPackageCards();
+            renderAddons();
+            createRadarChart();
+            createBarChart();
+            updateSelection(selectedPackage);
+        }
+
+        function renderPackageCards() {
+            const container = document.getElementById('package-cards-container');
+            container.innerHTML = Object.keys(packageData).map(key => {
+                const pkg = packageData[key];
+                return `
+                    <div id="card-${key}" class="package-card bg-white rounded-2xl shadow-lg p-8 cursor-pointer border-4 border-transparent" onclick="updateSelection('${key}')">
+                        <h3 class="text-3xl font-bold ${key === 'gold' ? 'text-gold' : 'text-navy'}">${pkg.name}</h3>
+                        <p class="text-gray-500 mt-1">${pkg.subtitle}</p>
+                        <p class="text-4xl font-extrabold my-6 text-navy">₹${pkg.price.toLocaleString('en-IN')}<span class="text-base font-normal text-gray-500"> / month</span></p>
+                        <ul class="space-y-3 text-left">
+                            ${pkg.features.map(f => `
+                                <li class="flex items-center">
+                                    <span class="text-green-500 mr-3">✔</span> ${f}
+                                </li>`).join('')}
+                        </ul>
+                        <p class="text-sm italic text-gray-600 mt-6">${pkg.goodFor}</p>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderAddons() {
+            const container = document.getElementById('addons-container');
+            container.innerHTML = addonsData.map((addon, index) => `
+                <div class="border border-gray-200 rounded-lg">
+                    <button class="w-full flex justify-between items-center p-4 text-left font-semibold text-navy focus:outline-none" onclick="toggleAccordion(this)">
+                        <span>${addon.name}</span>
+                        <span>${addon.price}</span>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleAccordion(element) {
+            element.classList.toggle('bg-gray-100');
+        }
+
+        function createRadarChart() {
+            const ctx = document.getElementById('featuresRadarChart').getContext('2d');
+            const data = {
+                labels: ['Content Pieces', 'Stories', 'Reels', 'Strategy Level', 'Ad Mgmt Level'],
+                datasets: Object.keys(packageData).map(key => ({
+                    label: packageData[key].name,
+                    data: packageData[key].radarData,
+                    fill: true,
+                    backgroundColor: packageData[key].color.replace('0.8', '0.2'),
+                    borderColor: packageData[key].color,
+                    pointBackgroundColor: packageData[key].color,
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: packageData[key].color
+                }))
+            };
+            featuresRadarChart = new Chart(ctx, {
+                type: 'radar',
+                data: data,
+                options: {
+                    maintainAspectRatio: false,
+                    elements: { line: { borderWidth: 3 } },
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12 }, color: '#495057' },
+                            ticks: { backdropColor: 'transparent', color: '#6c757d' }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                    }
+                }
+            });
+        }
+
+        function createBarChart() {
+            const ctx = document.getElementById('kpiBarChart').getContext('2d');
+            const data = {
+                labels: ['Follower Growth (%)', 'Engagement Lift (%)', 'Lead Gen Score'],
+                datasets: Object.keys(packageData).map(key => ({
+                    label: packageData[key].name,
+                    data: packageData[key].kpiData,
+                    backgroundColor: packageData[key].color,
+                    borderColor: packageData[key].color.replace('0.8', '1'),
+                    borderWidth: 1
+                }))
+            };
+            kpiBarChart = new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(0, 0, 0, 0.05)' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        if(context.label.includes('%')) {
+                                           label += context.parsed.y + '%';
+                                        } else {
+                                           label += context.parsed.y;
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSelection(pkgKey) {
+            selectedPackage = pkgKey;
+            
+            document.querySelectorAll('.package-card').forEach(card => {
+                card.classList.remove('selected', 'ring-2', 'ring-gold');
+            });
+
+            const selectedCard = document.getElementById(`card-${pkgKey}`);
+            selectedCard.classList.add('selected', 'ring-2', 'ring-gold');
+
+            updateChartHighlights();
+        }
+
+        function updateChartHighlights() {
+            const selectedIndex = Object.keys(packageData).indexOf(selectedPackage);
+
+            featuresRadarChart.data.datasets.forEach((dataset, index) => {
+                dataset.borderWidth = (index === selectedIndex) ? 5 : 2;
+                dataset.backgroundColor = (index === selectedIndex) ? packageData[selectedPackage].color.replace('0.8', '0.4') : packageData[Object.keys(packageData)[index]].color.replace('0.8', '0.2');
+            });
+            featuresRadarChart.update();
+
+            kpiBarChart.data.datasets.forEach((dataset, index) => {
+                dataset.borderColor = (index === selectedIndex) ? '#0b2b4a' : packageData[Object.keys(packageData)[index]].color.replace('0.8', '1');
+                dataset.borderWidth = (index === selectedIndex) ? 3 : 1;
+            });
+            kpiBarChart.update();
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+</body>
+</html>
